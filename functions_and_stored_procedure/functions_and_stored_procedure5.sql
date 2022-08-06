@@ -100,4 +100,3 @@ OBJECTPROPERTY(
   OBJECT_ID('[schema].[function_name]'),
   'IsDeterministic'
 )
-
