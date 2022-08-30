@@ -1,3 +1,7 @@
+/*
+[자르기]
+*/
+
 create TABLE Persons (
     name varchar(8),
     age INTEGER NOT NULL,
@@ -32,6 +36,7 @@ ORDER BY
     SUBSTRING(name, 1, 1);
 
 
+-- CASE를 활용하여 범위별 GROUP BY 가능(1)
 SELECT
     CASE
         WHEN age < 20 THEN 'kid'
@@ -49,6 +54,28 @@ GROUP BY
         WHEN age >= 70 THEN 'senior'
         ELSE null
     END;
+
+
+-- CASE를 활용하여 범위별 GROUP BY 가능(2)
+SELECT
+    CASE
+        WHEN weight / POWER(height / 100, 2) < 18.5 THEN '저체중'
+        WHEN 18.5 <= weight / POWER(height / 100, 2)
+        AND weight / POWER(height / 100, 2) < 25 THEN '정상'
+        WHEN 25 <= weight / POWER(height / 100, 2) THEN '과체중'
+        ELSE NULL
+    END AS bmi,
+    COUNT(1)
+FROM
+    persons
+GROUP BY
+    CASE
+        WHEN weight / POWER(height / 100, 2) < 18.5 THEN '저체중'
+        WHEN 18.5 <= weight / POWER(height / 100, 2)
+        AND weight / POWER(height / 100, 2) < 25 THEN '정상'
+        WHEN 25 <= weight / POWER(height / 100, 2) THEN '과체중'
+        ELSE NULL
+    END
 
 
 SELECT
@@ -89,3 +116,25 @@ ORDER BY
     age_class,
     age_rank_in_class;
 
+-- PARTITION BY 안에서도 CASE 문 가능
+SELECT
+    name,
+    CASE
+        WHEN age < 20 THEN 'kid'
+        WHEN age BETWEEN 20 AND 69 THEN 'adult'
+        WHEN age >= 70 THEN 'senior'
+    END AS age_class,
+    RANK() OVER(
+        PARTITION BY CASE
+            WHEN age < 20 THEN 'kid'
+            WHEN age BETWEEN 20 AND 69 THEN 'adult'
+            WHEN age >= 70 THEN 'senior'
+        END
+        ORDER BY
+            age
+    ) AS age_rank_in_class
+FROM
+    persons
+ORDER BY
+    age_class,
+    age_rank_in_class;
