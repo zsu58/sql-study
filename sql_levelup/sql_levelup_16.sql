@@ -159,4 +159,3 @@ FROM
     ) foo
 WHERE
     hc = min_code;
-
